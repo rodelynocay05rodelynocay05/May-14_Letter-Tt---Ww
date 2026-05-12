@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Arcade Interactive Board</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Balsamiq+Sans:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Balsamiq Sans', cursive;
+font-size:24px;
+}
+
+body{
+height:100vh;
+overflow:hidden;
+background:
+linear-gradient(rgba(255,182,193,0.10),
+rgba(255,105,180,0.10)),
+url('background_image.png');
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+color:white;
+}
+
+/* =========================
+MAIN POPUP
+========================= */
+
+#content-area{
+position:absolute;
+top:20px;
+left:50%;
+transform:translateX(-50%);
+width:72%;
+height:82%;
+background:white;
+border-radius:35px;
+padding:20px;
+overflow:hidden;
+display:none;
+z-index:100;
+box-shadow:0 0 25px hotpink;
+color:#ff1493;
+}
+
+/* =========================
+SMALL POPUP
+========================= */
+
+#small-popup{
+position:absolute;
+width:260px;
+height:260px;
+background:white;
+border-radius:25px;
+padding:15px;
+display:none;
+z-index:500;
+box-shadow:0 0 20px hotpink;
+color:#ff1493;
+overflow:hidden;
+}
+
+/* =========================
+CLOSE BUTTON
+========================= */
+
+.close-btn{
+position:absolute;
+top:8px;
+right:8px;
+background:#ff1493;
+color:white;
+border:none;
+border-radius:50%;
+width:42px;
+height:42px;
+cursor:pointer;
+font-size:22px;
+font-weight:bold;
+z-index:999;
+box-shadow:0 0 12px hotpink;
+display:flex;
+align-items:center;
+justify-content:center;
+}
+
+/* =========================
+BOTTOM BUTTONS
+========================= */
+
+.bottom-buttons{
+position:absolute;
+bottom:12px;
+left:50%;
+transform:translateX(-50%);
+display:flex;
+gap:10px;
+z-index:300;
+flex-wrap:wrap;
+justify-content:center;
+}
+
+.arcade-btn{
+padding:10px 18px;
+border:none;
+border-radius:18px;
+background:#ff69b4;
+color:white;
+font-weight:bold;
+cursor:pointer;
+transition:0.3s;
+box-shadow:0 0 15px hotpink;
+white-space:nowrap;
+font-size:20px;
+}
+
+.arcade-btn:hover{
+transform:scale(1.08);
+background:#ff1493;
+}
+
+/* =========================
+LEFT BUTTONS
+========================= */
+
+.side-buttons{
+position:absolute;
+left:15px;
+top:90px;
+display:flex;
+flex-direction:column;
+gap:12px;
+z-index:300;
+}
+
+.icon-wrapper{
+position:relative;
+display:flex;
+align-items:center;
+}
+
+.icon-btn{
+width:72px;
+height:72px;
+border:none;
+border-radius:50%;
+background:#ff69b4;
+color:white;
+font-size:32px;
+cursor:pointer;
+box-shadow:0 0 18px hotpink;
+transition:0.3s;
+}
+
+.icon-btn:hover{
+transform:scale(1.08);
+background:#ff1493;
+}
+
+/* =========================
+TOOLTIPS
+========================= */
+
+.tooltip{
+position:absolute;
+left:84px;
+background:white;
+color:#ff1493;
+padding:8px 14px;
+border-radius:15px;
+white-space:nowrap;
+font-size:18px;
+font-weight:bold;
+opacity:0;
+transform:translateX(-10px);
+transition:0.3s;
+pointer-events:none;
+box-shadow:0 0 15px pink;
+}
+
+.icon-wrapper:hover .tooltip{
+opacity:1;
+transform:translateX(0);
+}
+
+/* =========================
+INPUTS
+========================= */
+
+input{
+padding:8px;
+border:2px solid #ff69b4;
+border-radius:15px;
+width:100%;
+margin-top:5px;
+font-size:18px;
+}
+
+/* =========================
+DRAG
+========================= */
+
+.drag-container{
+display:flex;
+flex-wrap:wrap;
+gap:8px;
+margin-top:8px;
+}
+
+.draggable{
+padding:8px 12px;
+background:#ff69b4;
+color:white;
+border-radius:14px;
+cursor:grab;
+font-size:18px;
+}
+
+.dropzone{
+margin-top:8px;
+min-height:50px;
+border:3px dashed #ff69b4;
+border-radius:18px;
+display:flex;
+justify-content:center;
+align-items:center;
+padding:10px;
+background:#fff0f7;
+color:#ff1493;
+font-size:18px;
+}
+
+/* =========================
+TEACHER
+========================= */
+
+.teacher-floating{
+position:absolute;
+left:-35px;
+top:30px;
+width:210px;
+z-index:300;
+}
+
+.teacher-floating img{
+width:100%;
+filter:drop-shadow(0 0 15px hotpink);
+}
+
+.greetings-wrapper{
+position:relative;
+height:100%;
+padding-left:160px;
+overflow:hidden;
+}
+
+.section-title{
+font-size:22px;
+margin-top:5px;
+margin-bottom:5px;
+}
+
+/* =========================
+IFRAME
+========================= */
+
+iframe{
+border:none;
+border-radius:20px;
+}
+
+/* =========================
+DRAGON
+========================= */
+
+#dragon{
+position:fixed;
+top:50%;
+left:50%;
+transform:translate(-50%,-50%) scale(0);
+width:600px;
+z-index:9999;
+transition:0.4s;
+pointer-events:none;
+}
+
+.show-dragon{
+transform:translate(-50%,-50%) scale(1) !important;
+}
+
+/* =========================
+NAME PICKER
+========================= */
+
+.name-display{
+font-size:32px;
+font-weight:bold;
+line-height:1.5;
+margin-top:20px;
+}
+
+/* =========================
+TIMER
+========================= */
+
+.timer-box{
+display:flex;
+flex-direction:column;
+align-items:center;
+justify-content:center;
+margin-top:20px;
+gap:8px;
+}
+
+.timer-inputs{
+display:flex;
+gap:10px;
+width:100%;
+}
+
+.timer-inputs input{
+text-align:center;
+}
+
+/* =========================
+SCROLLBAR
+========================= */
+
+::-webkit-scrollbar{
+display:none;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- MAIN POPUP -->
+<div id="content-area"></div>
+
+<!-- SMALL POPUP -->
+<div id="small-popup"></div>
+
+<!-- BOTTOM BUTTONS -->
+<div class="bottom-buttons">
+<button class="arcade-btn" onclick="showGreetings()">Greetings</button>
+<button class="arcade-btn" onclick="showWarmup()">Warm-Up</button>
+<button class="arcade-btn" onclick="showReview()">Review</button>
+<button class="arcade-btn" onclick="showLearning()">Learning Proper</button>
+<button class="arcade-btn" onclick="showExit()">Exit</button>
+</div>
+
+<!-- LEFT BUTTONS -->
+<div class="side-buttons">
+
+<div class="icon-wrapper">
+<button class="icon-btn" onclick="showSettings(this)">⚙️</button>
+<div class="tooltip">Settings</div>
+</div>
+
+<div class="icon-wrapper">
+<button class="icon-btn" onclick="showMusic(this)">🎵</button>
+<div class="tooltip">Music</div>
+</div>
+
+<div class="icon-wrapper">
+<button class="icon-btn" onclick="showVideo(this)">🎬</button>
+<div class="tooltip">Video</div>
+</div>
+
+<div class="icon-wrapper">
+<button class="icon-btn" onclick="pickStudent(this)">🎯</button>
+<div class="tooltip">Name Picker</div>
+</div>
+
+<div class="icon-wrapper">
+<button class="icon-btn" onclick="showTimer(this)">⏰</button>
+<div class="tooltip">Timer</div>
+</div>
+
+<div class="icon-wrapper">
+<button class="icon-btn" onclick="startNoiseDetection(this)">🐉</button>
+<div class="tooltip">Noise Detector</div>
+</div>
+
+</div>
+
+<!-- FILES -->
+<input type="file" id="bgUpload" hidden accept="image/*">
+<input type="file" id="musicUpload" hidden accept="audio/*">
+<input type="file" id="videoUpload" hidden accept="video/*">
+
+<!-- AUDIO -->
+<audio id="musicPlayer"></audio>
+
+<audio id="bellSound">
+<source src="bell.mp3">
+</audio>
+
+<audio id="yeheySound">
+<source src="yehey.mp3">
+</audio>
+
+<!-- DRAGON -->
+<img id="dragon" src="dragon_noise.png">
+
+<script>
+
+const contentArea=document.getElementById('content-area');
+const smallPopup=document.getElementById('small-popup');
+
+let absentStudents=[];
+let currentGroup="boys";
+
+/* =========================
+POPUPS
+========================= */
+
+function openPopup(content){
+
+contentArea.style.display="block";
+
+contentArea.innerHTML=`
+
+<button class="close-btn"
+onclick="closePopup()">✖</button>
+
+${content}
+
+`;
+
+}
+
+function closePopup(){
+contentArea.style.display="none";
+}
+
+function closeSmallPopup(){
+smallPopup.style.display="none";
+}
+
+function showSmallPopup(content, button){
+
+const rect=button.getBoundingClientRect();
+
+smallPopup.style.display="block";
+
+smallPopup.style.left=(rect.right+12)+"px";
+smallPopup.style.top=(rect.top-10)+"px";
+
+smallPopup.innerHTML=`
+
+<button class="close-btn"
+onclick="closeSmallPopup()">✖</button>
+
+<div style="
+margin-top:40px;
+text-align:center;
+line-height:1.5;
+height:190px;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+overflow:hidden;
+">
+${content}
+</div>
+
+`;
+
+}
+
+/* =========================
+FULLSCREEN
+========================= */
+
+function openFullscreen(frameId){
+
+const elem=document.getElementById(frameId);
+
+if(elem.requestFullscreen){
+elem.requestFullscreen();
+}
+
+else if(elem.webkitRequestFullscreen){
+elem.webkitRequestFullscreen();
+}
+
+else if(elem.msRequestFullscreen){
+elem.msRequestFullscreen();
+}
+
+}
+
+/* =========================
+SETTINGS
+========================= */
+
+function showSettings(button){
+
+showSmallPopup(`
+
+⚙️ Settings
+
+<br><br>
+
+<button class="arcade-btn"
+onclick="document.getElementById('bgUpload').click()">
+Background
+</button>
+
+`, button);
+
+}
+
+/* =========================
+MUSIC
+========================= */
+
+function showMusic(button){
+
+showSmallPopup(`
+
+🎵 Music
+
+<br><br>
+
+<button class="arcade-btn"
+onclick="document.getElementById('musicUpload').click()">
+Upload
+</button>
+
+`, button);
+
+}
+
+/* =========================
+VIDEO
+========================= */
+
+function showVideo(button){
+
+showSmallPopup(`
+
+🎬 Video
+
+<br><br>
+
+<button class="arcade-btn"
+onclick="document.getElementById('videoUpload').click()">
+Upload
+</button>
+
+`, button);
+
+}
+
+/* =========================
+UPLOADS
+========================= */
+
+document.getElementById('bgUpload')
+.addEventListener('change', function(e){
+
+const file=e.target.files[0];
+
+if(file){
+
+const reader=new FileReader();
+
+reader.onload=function(event){
+
+document.body.style.backgroundImage=
+`linear-gradient(rgba(255,182,193,0.10),
+rgba(255,105,180,0.10)),
+url('${event.target.result}')`;
+
+}
+
+reader.readAsDataURL(file);
+
+}
+
+});
+
+document.getElementById('musicUpload')
+.addEventListener('change', function(e){
+
+const file=e.target.files[0];
+
+if(file){
+
+const audio=document.getElementById('musicPlayer');
+
+audio.src=URL.createObjectURL(file);
+
+audio.play();
+
+}
+
+});
+
+document.getElementById('videoUpload')
+.addEventListener('change', function(e){
+
+const file=e.target.files[0];
+
+if(file){
+
+openPopup(`
+
+<video width="100%"
+height="100%"
+controls autoplay>
+
+<source src="${URL.createObjectURL(file)}">
+
+</video>
+
+`);
+
+}
+
+});
+
+/* =========================
+GREETINGS
+========================= */
+
+function showGreetings(){
+
+openPopup(`
+
+<div class="greetings-wrapper">
+
+<div class="teacher-floating">
+<img src="teacher_image.png">
+</div>
+
+<div style="height:100%; display:flex; flex-direction:column; justify-content:space-between;">
+
+<div>
+
+<h1 style="
+font-size:30px;
+line-height:1.4;
+">
+🌸 Good Morning! <br>
+How are you today?
+</h1>
+
+</div>
+
+<div>
+
+<h2 class="section-title">
+📅 Today is...?
+</h2>
+
+<div class="drag-container">
+
+<div class="draggable" draggable="true">Monday</div>
+<div class="draggable" draggable="true">Tuesday</div>
+<div class="draggable" draggable="true">Wednesday</div>
+<div class="draggable" draggable="true">Thursday</div>
+<div class="draggable" draggable="true">Friday</div>
+<div class="draggable" draggable="true">Saturday</div>
+<div class="draggable" draggable="true">Sunday</div>
+
+</div>
+
+<div class="dropzone">
+Drop Day Here
+</div>
+
+</div>
+
+<div>
+
+<h2 class="section-title">
+⛅ What is the weather today?
+</h2>
+
+<div class="drag-container">
+
+<div class="draggable" draggable="true">Sunny ☀️</div>
+<div class="draggable" draggable="true">Rainy 🌧️</div>
+<div class="draggable" draggable="true">Cloudy ☁️</div>
+<div class="draggable" draggable="true">Windy 🌬️</div>
+
+</div>
+
+<div class="dropzone">
+Drop Weather Here
+</div>
+
+</div>
+
+<div>
+
+<h2 class="section-title">
+📌 Attendance
+</h2>
+
+<input id="absentInput"
+placeholder="Example: 3,7,15">
+
+<br><br>
+
+<button class="arcade-btn"
+onclick="saveAbsentStudents()">
+Save Attendance
+</button>
+
+</div>
+
+</div>
+
+</div>
+
+`);
+
+activateDrag();
+
+}
+
+/* =========================
+SAVE ABSENT
+========================= */
+
+function saveAbsentStudents(){
+
+const input=
+document.getElementById("absentInput").value;
+
+absentStudents=
+input.split(",")
+.map(n=>parseInt(n.trim()))
+.filter(n=>!isNaN(n));
+
+alert("Attendance Saved!");
+
+}
+
+/* =========================
+DRAG
+========================= */
+
+function activateDrag(){
+
+document.querySelectorAll(".draggable").forEach(d=>{
+
+d.addEventListener("dragstart", ()=>{
+d.classList.add("dragging");
+});
+
+d.addEventListener("dragend", ()=>{
+d.classList.remove("dragging");
+});
+
+});
+
+document.querySelectorAll(".dropzone").forEach(z=>{
+
+z.addEventListener("dragover", e=>{
+e.preventDefault();
+});
+
+z.addEventListener("drop", ()=>{
+
+const drag=document.querySelector(".dragging");
+
+if(drag){
+z.innerHTML=drag.innerHTML;
+}
+
+});
+
+});
+
+}
+
+/* =========================
+WARMUP
+========================= */
+
+function showWarmup(){
+
+openPopup(`
+<iframe width="100%" height="100%" src="warmup_video.mp4"></iframe>
+`);
+
+}
+
+/* =========================
+REVIEW
+========================= */
+
+function showReview(){
+
+openPopup(`
+
+<div style="width:100%; height:100%; position:relative;">
+
+<button class="arcade-btn"
+style="
+position:absolute;
+top:10px;
+left:10px;
+z-index:999;
+padding:10px 16px;
+"
+onclick="openFullscreen('reviewFrame')">
+⛶ Full Screen
+</button>
+
+<iframe
+id="reviewFrame"
+width="100%"
+height="100%"
+src="https://www.canva.com/design/DAHJby__o-o/qxzN45EAAKukdDOVTugZzQ/view?embed">
+</iframe>
+
+</div>
+
+`);
+
+}
+
+/* =========================
+LEARNING
+========================= */
+
+function showLearning(){
+
+openPopup(`
+
+<div style="width:100%; height:100%; position:relative;">
+
+<button class="arcade-btn"
+style="
+position:absolute;
+top:10px;
+left:10px;
+z-index:999;
+padding:10px 16px;
+"
+onclick="openFullscreen('learningFrame')">
+⛶ Full Screen
+</button>
+
+<iframe
+id="learningFrame"
+width="100%"
+height="100%"
+src="https://www.canva.com/design/DAHI2v8qLrM/evNqC7AKEfWl-3_GjKox3A/view?embed">
+</iframe>
+
+</div>
+
+`);
+
+}
+
+/* =========================
+EXIT
+========================= */
+
+function showExit(){
+
+openPopup(`
+<iframe width="100%" height="100%" src="https://www.canva.com/design/DAHJWK26WNE/E3oIRXYdwo9y5SXSkcIILw/view?embed"></iframe>
+`);
+
+}
+
+/* =========================
+NAME PICKER
+========================= */
+
+function pickStudent(button){
+
+let available=[];
+
+if(currentGroup==="boys"){
+
+for(let i=1;i<=13;i++){
+
+if(!absentStudents.includes(i)){
+available.push(i);
+}
+
+}
+
+currentGroup="girls";
+
+}else{
+
+for(let i=14;i<=27;i++){
+
+if(!absentStudents.includes(i)){
+available.push(i);
+}
+
+}
+
+currentGroup="boys";
+
+}
+
+if(available.length===0){
+
+showSmallPopup(`
+<div class="name-display">
+No Students
+</div>
+`, button);
+
+return;
+
+}
+
+const picked=
+available[Math.floor(Math.random()*available.length)];
+
+document.getElementById("yeheySound").play();
+
+showSmallPopup(`
+
+<div class="name-display">
+
+${currentGroup==="girls" ? "Boys" : "Girls"}
+
+<br><br>
+
+Student ${picked}
+
+</div>
+
+`, button);
+
+}
+
+/* =========================
+TIMER
+========================= */
+
+function showTimer(button){
+
+showSmallPopup(`
+
+<div class="timer-box">
+
+⏰ TIMER
+
+<div class="timer-inputs">
+
+<input id="mins"
+type="number"
+placeholder="Min">
+
+<input id="secs"
+type="number"
+placeholder="Sec">
+
+</div>
+
+<button class="arcade-btn"
+onclick="startTimer()">
+Start
+</button>
+
+<div id="time"
+style="
+font-size:28px;
+font-weight:bold;
+">
+</div>
+
+</div>
+
+`, button);
+
+}
+
+function startTimer(){
+
+let mins=
+parseInt(document.getElementById("mins").value) || 0;
+
+let secs=
+parseInt(document.getElementById("secs").value) || 0;
+
+let total=
+mins*60+secs;
+
+let x=setInterval(()=>{
+
+let m=Math.floor(total/60);
+let s=total%60;
+
+document.getElementById("time").innerHTML=
+m + ":" + (s<10?"0":"") + s;
+
+total--;
+
+if(total<0){
+
+clearInterval(x);
+
+document.getElementById("bellSound").play();
+
+}
+
+},1000);
+
+}
+
+/* =========================
+NOISE DETECTOR
+========================= */
+
+async function startNoiseDetection(button){
+
+showSmallPopup(`
+
+🐉<br><br>
+
+Noise Detector
+
+<br><br>
+
+ACTIVE
+
+`, button);
+
+try{
+
+const stream=
+await navigator.mediaDevices.getUserMedia({audio:true});
+
+const audioContext=
+new AudioContext();
+
+const microphone=
+audioContext.createMediaStreamSource(stream);
+
+const analyser=
+audioContext.createAnalyser();
+
+microphone.connect(analyser);
+
+analyser.fftSize=256;
+
+const dataArray=
+new Uint8Array(analyser.frequencyBinCount);
+
+function detectNoise(){
+
+analyser.getByteFrequencyData(dataArray);
+
+let volume=
+dataArray.reduce((a,b)=>a+b)/dataArray.length;
+
+if(volume>25){
+
+const dragon=
+document.getElementById("dragon");
+
+dragon.classList.add("show-dragon");
+
+setTimeout(()=>{
+
+dragon.classList.remove("show-dragon");
+
+},1800);
+
+}
+
+requestAnimationFrame(detectNoise);
+
+}
+
+detectNoise();
+
+}catch(err){
+
+alert("Microphone access denied.");
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
